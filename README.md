@@ -15,7 +15,7 @@
 ## 目录结构
 
 ```
-agent-runtime/
+./
 ├── agent/
 │   ├── __init__.py          # 包入口，统一导出
 │   ├── runtime.py           # 核心：Agent 主循环 + context 组装/压缩
@@ -32,6 +32,7 @@ agent-runtime/
 │   └── demo.py              # 交互式演示
 ├── tests/                   # pytest 测试用例
 ├── AI_PROMPT.md             # AI Prompt 与问题解决记录
+├── verify_all.py            # 一键验证（单元测试 + 真实 API 冒烟）
 ├── requirements.txt
 └── .env.example
 ```
