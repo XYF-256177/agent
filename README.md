@@ -31,8 +31,6 @@ agent-runtime/
 ├── examples/
 │   └── demo.py              # 交互式演示
 ├── tests/                   # pytest 测试用例
-├── docs/
-│   └── 架构设计_第6题_滑动窗口限流.md
 ├── AI_PROMPT.md             # AI Prompt 与问题解决记录
 ├── requirements.txt
 └── .env.example
