@@ -105,3 +105,18 @@ def test_no_compress_when_under_limit():
         session.messages.append({"role": "user", "content": f"msg {i}"})
     rt._compress_history(session)
     assert len(session.messages) == 3
+
+
+def test_remember_tool_writes_memory_and_recalled():
+    """LLM 调用 remember 工具后，信息写入长期记忆，且后续对话能相关性召回。"""
+    llm = FakeLLM(
+        [
+            tool_response("remember", {"key": "专业", "value": "数据科学"}, "c1"),
+            final_response("已记住你的专业是数据科学"),
+        ]
+    )
+    rt = _runtime(llm)
+    ans = rt.run("请记住我的专业是数据科学", session_id="s1", user_id="u1")
+    assert "数据科学" in ans
+    recalled = rt.memory.recall("u1", "你学什么专业")
+    assert any("数据科学" in f["value"] for f in recalled)

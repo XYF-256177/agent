@@ -38,3 +38,15 @@ def test_recall_fallback_to_recent_when_no_match():
 def test_estimate_tokens():
     assert estimate_tokens("") == 0
     assert estimate_tokens("abcd") == 2
+
+
+def test_recall_chinese_bigram():
+    """验证中文按 bigram 分词后能被正确召回。
+
+    原实现用空格分词对中文完全失效；修复后应能命中。
+    """
+    m = Memory()
+    m.remember("A", "学校", "梧州学院")
+    m.remember("A", "专业", "数据科学")
+    got = m.recall("A", "梧州学院在哪里")
+    assert got and "梧州学院" in got[0]["value"]

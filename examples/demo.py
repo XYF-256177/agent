@@ -53,7 +53,7 @@ def main() -> None:
             print(f"已切换到会话 [{session_id}]")
             continue
 
-        reply = runtime.run(user_input, session_id=session_id)
+        reply = runtime.run(user_input, session_id=session_id, user_id="demo-user")
         print(f"[{session_id}] Agent: {reply}")
 
 

@@ -96,7 +96,7 @@ class AgentRuntime:
 
             if parsed.has_tool_calls:
                 # Step 3: 调用工具并回填结果
-                self._execute_tools(session, parsed, session_id, trace_id)
+                self._execute_tools(session, parsed, session_id, user_id, trace_id)
                 continue  # Step 4: 继续 loop
 
             # Step 4: 无工具调用，返回最终答案
@@ -118,6 +118,7 @@ class AgentRuntime:
         session: Session,
         parsed: ParsedOutput,
         session_id: str,
+        user_id: str,
         trace_id: str,
     ) -> None:
         """执行本轮所有工具调用，并回填 assistant/tool 消息。"""
@@ -142,7 +143,13 @@ class AgentRuntime:
             )
             # 注入隐藏参数 session_id，保证 todo 等工具按会话隔离
             result = self.registry.call(
-                tc.name, tc.arguments, context={"session_id": session_id}
+                tc.name,
+                tc.arguments,
+                context={
+                    "session_id": session_id,
+                    "user_id": user_id,
+                    "memory": self.memory,
+                },
             )
             self._log_trace(
                 trace_id,
@@ -165,7 +172,9 @@ class AgentRuntime:
         """组装完整 context = system prompt + 历史消息。"""
         self._compress_history(session)
 
-        memory_text = self.memory.summarize(user_id)
+        # 相关性召回：只把与本次 query 相关的长期记忆注入 prompt，避免无关记忆撑爆上下文
+        facts = self.memory.recall(user_id, query, top_k=5)
+        memory_text = "\n".join(f"- {f['key']}: {f['value']}" for f in facts)
         memory_section = (
             "已记住的长期信息：\n" + memory_text if memory_text else ""
         )

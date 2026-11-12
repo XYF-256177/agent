@@ -7,13 +7,13 @@ from agent.tools import build_default_registry
 
 def test_build_default_registry():
     reg = build_default_registry()
-    assert set(reg.names()) == {"calculator", "search", "todo"}
+    assert set(reg.names()) == {"calculator", "search", "todo", "remember"}
 
 
 def test_to_openai_schema():
     reg = build_default_registry()
     schema = reg.to_openai_schema()
-    assert len(schema) == 3
+    assert len(schema) == 4
     for item in schema:
         assert item["type"] == "function"
         assert item["function"]["name"] in reg.names()
